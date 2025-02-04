@@ -1,0 +1,132 @@
+Sudo apt-get update
+Sudo apt-get install openssh-server git curl –y
+Sudo systemctl enable ssh
+Sudo systemctl status ssh
+Download vscode deb file from website (vscode ubuntu)
+Sudo apt-get install ./<file>.deb
+Git clone …
+Code (nom du projet facultatif)
+curl -sSL https://get.docker.com | sudo sh
+Tester l'installation : sudo docker run hello-world
+
+
+### Installation de Docker sur Ubuntu
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io
+
+# Installation en une ligne (moins sécurisée)
+curl -sSL https://get.docker.com | sudo sh
+
+# Tester l'installation
+sudo docker run hello-world
+
+# Ajouter utilisateur au groupe Docker
+sudo usermod -aG docker $USER
+sudo reboot
+newgrp docker
+
+# Vérifier l’installation
+docker info
+docker ps
+docker ps -a
+
+### Manipulation des Conteneurs
+# Exécuter un conteneur
+docker run debian
+docker run -d debian sleep 3600
+
+# Voir les logs
+docker logs <container_id>
+
+# Arrêter et supprimer un conteneur
+docker stop <container_id>
+docker rm <container_id>
+
+# Liste des conteneurs
+docker ps -a
+
+# Exécuter en mode interactif
+docker run -it debian /bin/bash
+
+# Supprimer tous les conteneurs arrêtés
+docker rm $(docker ps -aq -f status=exited)
+
+### Gestion des Images
+# Lister les images
+docker images
+
+# Supprimer une image
+docker rmi <image_id>
+
+# Nettoyer les images non utilisées
+docker image prune -a
+
+# Télécharger une image
+docker pull nginx
+
+# Lancer un serveur web Nginx
+docker run -p 8080:80 --name "test_nginx" nginx
+
+### Gestion des Réseaux
+# Créer un réseau
+docker network create wordpress
+
+# Lancer MySQL avec variables d’environnement
+docker run --name mysql_db --network wordpress -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=mydb -d mysql:5.7
+
+### Dockerfile - Création d’Images Personnalisées
+# Exemple de Dockerfile
+FROM ubuntu:latest  # Utilise l'image Ubuntu la plus récente comme base
+RUN apt-get update -y  # Met à jour la liste des paquets disponibles
+RUN apt-get install -y python3-pip  # Installe pip, le gestionnaire de paquets Python
+COPY ./requirements.txt /requirements.txt  # Copie le fichier des dépendances Python dans l'image
+RUN pip3 install -r /requirements.txt  # Installe les dépendances Python listées dans requirements.txt
+COPY ./ /app  # Copie tout le code de l'application dans le répertoire /app du conteneur
+WORKDIR /app  # Définit le répertoire de travail par défaut à /app
+CMD ["python3", "app.py"]  # Commande exécutée au démarrage du conteneur (lance l'application Python)
+========
+FROM ubuntu:latest  # Utilise Ubuntu comme base
+RUN apt-get update -y  # Met à jour la liste des paquets disponibles
+RUN apt-get install -y python3-pip  # Installe pip pour gérer les paquets Python
+
+COPY ./requirements.txt /requirements.txt  # Copie le fichier des dépendances Python
+RUN pip3 install -r requirements.txt  # Installe les dépendances listées dans requirements.txt
+
+ENV FLASK_APP microblog.py  # Définit une variable d'environnement pour Flask (permet de lancer l'app Flask)
+COPY ./ /microblog  # Copie tout le code source dans le répertoire /microblog du conteneur
+WORKDIR /microblog  # Définit le répertoire de travail par défaut à /microblog
+
+CMD ["./boot.sh"]  # Exécute le script boot.sh au démarrage du conteneur
+CMD ["/bin/sleep", "3600"]  # (⚠️ Problème) Cette ligne remplace la précédente, ce qui empêche le lancement de l'application
+
+solution: Avec ENTRYPOINT, le conteneur exécutera boot.sh, puis restera actif avec sleep 3600
+ENTRYPOINT ["./boot.sh"]
+CMD ["/bin/sleep", "3600"]
+
+
+# Construire une image
+docker build -t mon_app .
+
+# Lancer un conteneur basé sur cette image
+docker run -p 5000:5000 mon_app
+
+### Docker Hub
+# Se connecter à Docker Hub
+docker login
+
+# Tagger et envoyer une image
+docker tag mon_app utilisateur/mon_app
+docker push utilisateur/mon_app
+
+### Autres Commandes Utiles
+# Voir les détails d’un conteneur
+docker inspect <container_id>
+
+# Accéder à un conteneur en cours d’exécution
+docker exec -it <container_id> /bin/bash
+
+# Voir l'utilisation des ressources
+docker stats
+
+### Healthcheck dans un Dockerfile
+HEALTHCHECK CMD curl --fail http://localhost:5000/health || exit 1
