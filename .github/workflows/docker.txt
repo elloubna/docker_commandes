@@ -1,3 +1,5 @@
+to clone the file:  wget https://raw.githubusercontent.com/elloubna/docker_commandes/main/.github/workflows/docker.txt
+
 Sudo apt-get update
 Sudo apt-get install openssh-server git curl –y
 Sudo systemctl enable ssh
